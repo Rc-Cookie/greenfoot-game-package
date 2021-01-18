@@ -4,7 +4,7 @@ import greenfoot.Color;
 import greenfoot.GreenfootImage;
 import greenfoot.World;
 import com.github.rccookie.common.geometry.Vector2D;
-import com.github.rccookie.greenfoot.game.AdvancedActor;
+import com.github.rccookie.greenfoot.core.AdvancedActor;
 import com.github.rccookie.greenfoot.game.raycast.Raycast.*;
 import com.github.rccookie.greenfoot.ui.util.Theme;
 

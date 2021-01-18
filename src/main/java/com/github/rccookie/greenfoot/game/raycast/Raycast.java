@@ -24,7 +24,7 @@ import com.github.rccookie.common.geometry.Transform2D;
 import com.github.rccookie.common.geometry.Edge2D;
 import com.github.rccookie.common.geometry.Vector2D;
 import com.github.rccookie.common.geometry.Raycast.Raycast2D;
-import com.github.rccookie.greenfoot.game.AdvancedActor;
+import com.github.rccookie.greenfoot.core.AdvancedActor;
 
 /**
  * A class that contains some methods raycasting in Greenfoot.

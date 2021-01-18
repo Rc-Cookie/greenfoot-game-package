@@ -3,7 +3,7 @@ package com.github.rccookie.greenfoot.game.graphics;
 import greenfoot.Color;
 import greenfoot.GreenfootImage;
 import com.github.rccookie.common.geometry.Vector2D;
-import com.github.rccookie.greenfoot.game.physics.PhysicalActor;
+import com.github.rccookie.greenfoot.core.physics.PhysicalActor;
 
 public class Particle extends PhysicalActor {
 

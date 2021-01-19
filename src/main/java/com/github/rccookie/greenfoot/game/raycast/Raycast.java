@@ -24,7 +24,7 @@ import com.github.rccookie.common.geometry.Transform2D;
 import com.github.rccookie.common.geometry.Edge2D;
 import com.github.rccookie.common.geometry.Vector2D;
 import com.github.rccookie.common.geometry.Raycast.Raycast2D;
-import com.github.rccookie.greenfoot.core.AdvancedActor;
+import com.github.rccookie.greenfoot.core.CoreActor;
 
 /**
  * A class that contains some methods raycasting in Greenfoot.
@@ -144,7 +144,7 @@ public final class Raycast {
     @SuppressWarnings("rawtypes")
     public static final Raycast raycast(Actor from, Class clazz, double maxDistance, Actor... ignore) {
         if(from == null) return null;
-        double angle = from instanceof AdvancedActor ? ((AdvancedActor)from).getAngle() : from.getRotation();
+        double angle = from instanceof CoreActor ? ((CoreActor)from).getAngle() : from.getRotation();
         return raycast(from, angle, clazz, maxDistance, ignore);
     }
 
@@ -172,12 +172,12 @@ public final class Raycast {
     }
 
     private static final double getX(Actor a) {
-        if(a instanceof AdvancedActor) return ((AdvancedActor)a).x();
+        if(a instanceof CoreActor) return ((CoreActor)a).x();
         return a.getX();
     }
 
     private static final double getY(Actor a) {
-        if(a instanceof AdvancedActor) return ((AdvancedActor)a).y();
+        if(a instanceof CoreActor) return ((CoreActor)a).y();
         return a.getY();
     }
 

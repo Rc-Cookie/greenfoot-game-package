@@ -26,8 +26,6 @@ import com.github.rccookie.greenfoot.ui.basic.UIWorld;
 
 public abstract class GameWorld extends UIWorld {
 
-    private static final long serialVersionUID = 8672508121668682280L;
-
     /**
      * The precition the score is being saved with. It describes the factor the
      * score is being scaled with when being saved as an interger. For displaying
@@ -363,7 +361,7 @@ public abstract class GameWorld extends UIWorld {
         state = State.NOT_STARTED;
         colorBackground(UI_COLOR_1);
         if(SHOW_FPS) addFps();
-        if(FADE_IN_AT_START) add(Fade.fadeIn(UI_COLOR_1, 1), 0.5, 0.5);
+        if(FADE_IN_AT_START) addRelative(Fade.fadeIn(UI_COLOR_1, 1), 0.5, 0.5);
         Greenfoot.start();
     }
 
@@ -385,7 +383,7 @@ public abstract class GameWorld extends UIWorld {
      * @see #endedUpdate()
      */
     @Override
-    protected void physicsUpdate() {
+    public void update() {
         lastKey = Greenfoot.getKey();
         if(firstFrame) runCreated();
         runUpdate();
@@ -407,7 +405,7 @@ public abstract class GameWorld extends UIWorld {
      * Runs all update methods.
      */
     private void runUpdate() {
-        update();
+        generalUpdate();
         if(state == State.NOT_STARTED) internalNotStartedUpdate();
         else if(state == State.RUNNING) internalGameUpdate();
         else if(state == State.PAUSED) pauseUpdate();
@@ -467,7 +465,7 @@ public abstract class GameWorld extends UIWorld {
     /**
      * Called once per frame independent of the game's state.
      */
-    public void update() { }
+    public void generalUpdate() { }
 
     /**
      * Called once per frame only as long as the game has not started.
@@ -856,7 +854,7 @@ public abstract class GameWorld extends UIWorld {
         if(autoSaveScore) saveScore();
         removePauseButton();
         for(Consumer<Double> action : gameEndActions) action.accept(getScore());
-        if(useEndscreen) add(Fade.fadeOut(UI_COLOR_1, 1), 0.5, 0.5);
+        if(useEndscreen) addRelative(Fade.fadeOut(UI_COLOR_1, 1), 0.5, 0.5);
     }
 
 
@@ -1056,7 +1054,7 @@ public abstract class GameWorld extends UIWorld {
      * Creates and adds a text displaying the time until the game start.
      */
     private void addStartCountdown() {
-        add(startCountdown = new Text((int)Math.ceil(startDelay / 1000000000d) + "", 25), 0.5, 0.5);
+        addRelative(startCountdown = new Text((int)Math.ceil(startDelay / 1000000000d) + "", 25), 0.5, 0.5);
     }
 
     private Text timer = null;
@@ -1065,8 +1063,8 @@ public abstract class GameWorld extends UIWorld {
      * Creates and adds a text displaying either the time elapsed or the remaining time.
      */
     private void addTimer() {
-        if(limitTime) add(timer = new Text(formatDouble(getRemainingTime()), 25), 0.5, 0.2);
-        else add(timer = new Text(formatDouble(timeElapsed()), 25), 0.5, 0.2);
+        if(limitTime) addRelative(timer = new Text(formatDouble(getRemainingTime()), 25), 0.5, 0.2);
+        else addRelative(timer = new Text(formatDouble(timeElapsed()), 25), 0.5, 0.2);
     }
 
 
@@ -1076,7 +1074,7 @@ public abstract class GameWorld extends UIWorld {
      * Creates and and adds a text displaying the players current score.
      */
     private void addScoreDisplay() {
-        add(scoreText = new Text(scoreTitle + ": " + Geometry.floor(getScore(), -2)), 0.5, 0, 0, 20);
+        addRelative(scoreText = new Text(scoreTitle + ": " + Geometry.floor(getScore(), -2)), 0.5, 0, 0, 20);
     }
 
 
@@ -1086,7 +1084,7 @@ public abstract class GameWorld extends UIWorld {
      * Creates and adds a pause button.
      */
     private void addPauseButton() {
-        add(pauseButton = new TextButton(new Text("Pause")).addClickAction(m -> pause()), 1, 0, -27, 12);
+        addRelative(pauseButton = new TextButton(new Text("Pause")).addClickAction(() -> pause()), 1, 0, -27, 12);
     }
 
     /**
@@ -1103,7 +1101,7 @@ public abstract class GameWorld extends UIWorld {
      * Creates and adds a pause ui.
      */
     private void addPauseUI() {
-        add(pausePanel = new PausePanel(), 0.5, 0.5);
+        addRelative(pausePanel = new PausePanel(), 0.5, 0.5);
     }
 
     /**
@@ -1118,33 +1116,29 @@ public abstract class GameWorld extends UIWorld {
      */
     private class PausePanel extends UIPanel {
 
-        private static final long serialVersionUID = -8004648068174026741L;
-
         /**
          * Creates a new pause interface.
          */
         public PausePanel() {
             super(GameWorld.this.getWidth(), 200, UI_COLOR_1);
-            add(new PauseUIText("Paused", 25, TEXT_COLOR_3), 0.5, 0.2);
-            add(new PauseUIText(getGameStateString(), TEXT_COLOR_1), 0.5, 0.5);
+            addRelative(new PauseUIText("Paused", 25, TEXT_COLOR_3), 0.5, 0.2);
+            addRelative(new PauseUIText(getGameStateString(), TEXT_COLOR_1), 0.5, 0.5);
             if(allowRestart) {
-                add(new PauseUIButton(new Text("Quit")).addClickAction(m -> quit()), 0.5, 0.8, -100, 0);
-                add(new PauseUIButton(new Text("Restart")).addClickAction(m -> restart()), 0.5, 0.8);
-                add(new PauseUIButton(new Text("Resume")).addClickAction(m -> start()), 0.5, 0.8, 100, 0);
+                addRelative(new PauseUIButton(new Text("Quit")).addClickAction(() -> quit()), 0.5, 0.8, -100, 0);
+                addRelative(new PauseUIButton(new Text("Restart")).addClickAction(() -> restart()), 0.5, 0.8);
+                addRelative(new PauseUIButton(new Text("Resume")).addClickAction(() -> start()), 0.5, 0.8, 100, 0);
             }
             else {
-                add(new PauseUIButton(new Text("Quit")).addClickAction(m -> quit()), 0.5, 0.8, -50, 0);
-                add(new PauseUIButton(new Text("Resume")).addClickAction(m -> start()), 0.5, 0.8, 50, 0);
+                addRelative(new PauseUIButton(new Text("Quit")).addClickAction(() -> quit()), 0.5, 0.8, -50, 0);
+                addRelative(new PauseUIButton(new Text("Resume")).addClickAction(() -> start()), 0.5, 0.8, 50, 0);
             }
-            add(new PauseUIBackground(), 0.5, 0.5);
+            addRelative(new PauseUIBackground(), 0.5, 0.5);
         }
 
         /**
          * A text that is painted above other ui.
          */
         private class PauseUIText extends Text {
-            
-            private static final long serialVersionUID = -878077560724895919L;
 
             public PauseUIText(String content, Color color) {
                 super(content, color);
@@ -1158,7 +1152,6 @@ public abstract class GameWorld extends UIWorld {
          * A ui panel that is painted above other ui.
          */
         private class PauseUIBackground extends UIPanel {
-            private static final long serialVersionUID = 598688973441931156L;
 
             public PauseUIBackground() {
                 super(GameWorld.this, new Color(0, 0, 0, 80));
@@ -1169,7 +1162,6 @@ public abstract class GameWorld extends UIWorld {
          * A button that is painted above other buttons.
          */
         private class PauseUIButton extends TextButton {
-            private static final long serialVersionUID = -553609554352780873L;
 
             public PauseUIButton(Text text) {
                 super(text);
@@ -1216,8 +1208,6 @@ public abstract class GameWorld extends UIWorld {
      */
     private class Result extends UIWorld {
 
-        private static final long serialVersionUID = 3051330800952208486L;
-
         /**
          * Creates a new result world.
          */
@@ -1229,18 +1219,18 @@ public abstract class GameWorld extends UIWorld {
             );
             if(SHOW_FPS) addFps();
             colorBackground(UI_COLOR_1);
-            add(new Text(endingText, 30), 0.5, 0.15);
+            addRelative(new Text(endingText, 30), 0.5, 0.15);
             if(useScore) {
-                add(new Text(scoreTitle + ": " + formatDouble(getScore()), 20), 0.5, 0.5);
-                add(new Text("Personal highscore: " + formatDouble(getHighscore()), 16), 0.5, 0.6);
+                addRelative(new Text(scoreTitle + ": " + formatDouble(getScore()), 20), 0.5, 0.5);
+                addRelative(new Text("Personal highscore: " + formatDouble(getHighscore()), 16), 0.5, 0.6);
             }
             if(allowRestart) {
-                add(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(m -> quit()), 0.5, 0.9, -50, 0);
-                add(new TextButton(new Text("Restart")).setMinWidth(80).setMinHeight(30).addClickAction(m -> restart()), 0.5, 0.9, 50, 0);
+                addRelative(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(() -> quit()), 0.5, 0.9, -50, 0);
+                addRelative(new TextButton(new Text("Restart")).setMinWidth(80).setMinHeight(30).addClickAction(() -> restart()), 0.5, 0.9, 50, 0);
             }
-            else add(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(m -> quit()), 0.5, 0.9);
-            if(linkHighscores) add(new TextButton(new Text("Highscores")).setMinWidth(80).setMinHeight(30).addClickAction(m -> openHighscores()), 0.1, 0.9);
-            add(Fade.fadeIn(UI_COLOR_1, 1.5), 0.5, 0.5);
+            else addRelative(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(() -> quit()), 0.5, 0.9);
+            if(linkHighscores) addRelative(new TextButton(new Text("Highscores")).setMinWidth(80).setMinHeight(30).addClickAction(() -> openHighscores()), 0.1, 0.9);
+            addRelative(Fade.fadeIn(UI_COLOR_1, 1.5), 0.5, 0.5);
         }
     }
 
@@ -1251,8 +1241,6 @@ public abstract class GameWorld extends UIWorld {
      * <p>Includes a 'quit' button and, if allowed, a 'restart button'
      */
     private class Highscores extends UIWorld {
-
-        private static final long serialVersionUID = -7254153215356410025L;
 
         /**
          * Creates a new Highscore world.
@@ -1265,15 +1253,15 @@ public abstract class GameWorld extends UIWorld {
             );
             if(SHOW_FPS) addFps();
             colorBackground(UI_COLOR_1);
-            add(new Text(endingText, 30), 0.5, 0.15);
+            addRelative(new Text(endingText, 30), 0.5, 0.15);
 
             Scoreboard.ScorePanel.SCORE_PRECITION = 100;
-            add(new Scoreboard(getWidth() - 150, getHeight() - 180), 0.5, 0.55);
+            addRelative(new Scoreboard(getWidth() - 150, getHeight() - 180), 0.5, 0.55);
 
-            add(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(m -> quit()), 0.1, 0.9);
-            if(allowRestart) add(new TextButton(new Text("Restart")).setMinWidth(80).setMinHeight(30).addClickAction(m -> restart()), 0.9, 0.9);
+            addRelative(new TextButton(new Text("Quit")).setMinWidth(80).setMinHeight(30).addClickAction(() -> quit()), 0.1, 0.9);
+            if(allowRestart) addRelative(new TextButton(new Text("Restart")).setMinWidth(80).setMinHeight(30).addClickAction(() -> restart()), 0.9, 0.9);
 
-            add(Fade.fadeIn(UI_COLOR_1, 0.5), 0.5, 0.5);
+            addRelative(Fade.fadeIn(UI_COLOR_1, 0.5), 0.5, 0.5);
         }
     }
 

@@ -4,7 +4,7 @@ import greenfoot.Color;
 import greenfoot.GreenfootImage;
 import greenfoot.World;
 import com.github.rccookie.common.geometry.Vector2D;
-import com.github.rccookie.greenfoot.core.AdvancedActor;
+import com.github.rccookie.greenfoot.core.CoreActor;
 import com.github.rccookie.greenfoot.game.raycast.Raycast.*;
 import com.github.rccookie.greenfoot.ui.util.Theme;
 
@@ -39,19 +39,9 @@ public class RaycastVisualizer {
     }
 
 
-    
-
-
-
-
-
-
-
 
     @IgnoreOnRaycasts
-    private abstract class Marker extends AdvancedActor {
-
-        private static final long serialVersionUID = 3728874296444948499L;
+    private abstract class Marker extends CoreActor {
 
         final Color color;
 
@@ -68,8 +58,6 @@ public class RaycastVisualizer {
 
     @IgnoreOnRaycasts
     private class HitMarker extends Marker {
-
-        private static final long serialVersionUID = 4467901396612453042L;
 
         private boolean visible = false;
         
@@ -95,8 +83,6 @@ public class RaycastVisualizer {
 
     @IgnoreOnRaycasts
     private class RayMarker extends Marker {
-
-        private static final long serialVersionUID = 4983064798440625605L;
         
         private final int maxLength;
 

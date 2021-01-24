@@ -28,6 +28,7 @@ public class Raycasting {
         this.actor = actor;
     }
 
+    @SuppressWarnings("unchecked")
     public void update() {
         raycast = Raycast.raycast(actor, actor.getRotation() + angle, clazz, maxLength, ignore);
         drawDebug();

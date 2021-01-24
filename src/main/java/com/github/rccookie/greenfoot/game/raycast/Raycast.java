@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import greenfoot.Actor;
 import greenfoot.Color;
@@ -68,20 +69,21 @@ public final class Raycast {
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static final Raycast raycast(Actor source, Ray2D ray, World world, Class clazz, double maxDistance, Actor[] ignore) {
+    @SuppressWarnings("unchecked")
+    private static final <C> Raycast raycast(Actor source, Ray2D ray, World world, Class<C> clazz, double maxDistance, Predicate<C> filter, C[] ignore) {
         // Check for null
         Objects.requireNonNull(ray, "The ray to cast must not be null");
         if(world == null) return null;
 
         // Get objects
         List<Actor> actors;
-        actors = world.getObjects(clazz != null ? clazz : Actor.class);
+        if(clazz != null) actors = world.getObjects(clazz).stream().map(c -> (Actor)c).collect(Collectors.toList());
+        else actors = world.getObjects(Actor.class);
 
         // Remove source and ignored objects
         actors.remove(source);
         if(ignore != null && ignore.length > 0) actors.removeAll(Arrays.asList(ignore));
-        removeIf(actors, a -> ignore(a) || a.getImage() == null);
+        removeIf(actors, a -> ignore(a) || a.getImage() == null || !filter.test((C)a));
 
         // Remove objects that are too far away
         if(Double.isFinite(maxDistance) && maxDistance > 0) {
@@ -99,6 +101,10 @@ public final class Raycast {
         return raycast(source, ray, actors, maxDistance);
     }
 
+    private static final <C> Raycast raycast(Actor source, Ray2D ray, World world, Class<C> clazz, double maxDistance, C[] ignore) {
+        return raycast(source, ray, world, clazz, maxDistance, c -> true, ignore);
+    }
+
     private static final <T> void removeIf(List<T> list, Predicate<T> filter) {
         final Iterator<T> each = list.iterator();
         while (each.hasNext()) {
@@ -108,21 +114,36 @@ public final class Raycast {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Ray2D ray, World world, Class clazz, double maxDistance, Actor... ignore) {
+    @SafeVarargs
+    public static final <C> Raycast raycast(Ray2D ray, World world, Class<C> clazz, double maxDistance, C... ignore) {
         return raycast(null, ray, world, clazz, maxDistance, ignore);
     }
 
+    @SafeVarargs
+    public static final <C> Raycast raycast(Ray2D ray, World world, Class<C> clazz, double maxDistance, Predicate<C> filter, C... ignore) {
+        return raycast(null, ray, world, clazz, maxDistance, filter, ignore);
+    }
 
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, Vector2D direction, Class clazz, double maxDistance, Actor... ignore) {
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Vector2D direction, Class<C> clazz, double maxDistance, C... ignore) {
         return raycast(from, new Ray2D(new Vector2D(getX(from), getY(from)), direction), from.getWorld(), clazz, maxDistance, ignore);
     }
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, Vector2D direction, Class clazz, Actor... ignore) {
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Vector2D direction, Class<C> clazz, double maxDistance, Predicate<C> filter, C... ignore) {
+        return raycast(from, new Ray2D(new Vector2D(getX(from), getY(from)), direction), from.getWorld(), clazz, maxDistance, filter, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Vector2D direction, Class<C> clazz, C... ignore) {
         return raycast(from, direction, clazz, Double.POSITIVE_INFINITY, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Vector2D direction, Class<C> clazz, Predicate<C> filter, C... ignore) {
+        return raycast(from, direction, clazz, Double.POSITIVE_INFINITY, filter, ignore);
     }
 
     public static final Raycast raycast(Actor from, Vector2D direction, Actor... ignore) {
@@ -130,36 +151,65 @@ public final class Raycast {
     }
 
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, double angle, Class clazz, double maxLength, Actor... ignore) {
-        return raycast(from, Vector2D.angledVector(angle, 1), clazz, maxLength, ignore);
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, double angle, Class<C> clazz, double maxDistance, C... ignore) {
+        return raycast(from, Vector2D.angledVector(angle, 1), clazz, maxDistance, ignore);
     }
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, double angle, Class clazz, Actor... ignore) {
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, double angle, Class<C> clazz, double maxDistance, Predicate<C> filter, C... ignore) {
+        return raycast(from, Vector2D.angledVector(angle, 1), clazz, maxDistance, filter, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, double angle, Class<C> clazz, C... ignore) {
         return raycast(from, angle, clazz, Double.POSITIVE_INFINITY, ignore);
     }
 
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, double angle, Class<C> clazz, Predicate<C> filter, C... ignore) {
+        return raycast(from, angle, clazz, Double.POSITIVE_INFINITY, filter, ignore);
+    }
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, Class clazz, double maxDistance, Actor... ignore) {
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Class<C> clazz, double maxDistance, C... ignore) {
         if(from == null) return null;
         double angle = from instanceof CoreActor ? ((CoreActor)from).getAngle() : from.getRotation();
         return raycast(from, angle, clazz, maxDistance, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Class<C> clazz, double maxDistance, Predicate<C> filter, C... ignore) {
+        if(from == null) return null;
+        double angle = from instanceof CoreActor ? ((CoreActor)from).getAngle() : from.getRotation();
+        return raycast(from, angle, clazz, maxDistance, filter, ignore);
     }
 
     public static final Raycast raycast(Actor from, double maxDistance, Actor... ignore) {
         return raycast(from, null, maxDistance, ignore);
     }
 
-    @SuppressWarnings("rawtypes")
-    public static final Raycast raycast(Actor from, Class clazz, Actor... ignore) {
+    @SafeVarargs
+    public static final Raycast raycast(Actor from, double maxDistance, Predicate<Actor> filter, Actor... ignore) {
+        return raycast(from, null, maxDistance, filter, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Class<C> clazz, Predicate<C> filter, C... ignore) {
+        return raycast(from, clazz, Double.POSITIVE_INFINITY, filter, ignore);
+    }
+
+    @SafeVarargs
+    public static final <C> Raycast raycast(Actor from, Class<C> clazz, C... ignore) {
         return raycast(from, clazz, Double.POSITIVE_INFINITY, ignore);
     }
 
-    @SuppressWarnings("rawtypes")
     public static final Raycast raycast(Actor from, Actor... ignore) {
-        return raycast(from, (Class)null, ignore);
+        return raycast(from, (Class<Actor>)null, ignore);
+    }
+
+    public static final Raycast raycast(Actor from, Predicate<Actor> filter, Actor... ignore) {
+        return raycast(from, (Class<Actor>)null, filter, ignore);
     }
 
 

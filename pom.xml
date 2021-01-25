@@ -6,7 +6,7 @@
 
   <groupId>com.github.rccookie</groupId>
   <artifactId>greenfoot-game</artifactId>
-  <version>1.2.1.4</version>
+  <version>1.2.1.5</version>
 
   <name>greenfoot-game</name>
   <!-- FIXME change it to the project's website -->
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>com.github.rccookie</groupId>
       <artifactId>greenfoot-ui</artifactId>
-      <version>1.2.0.5</version>
+      <version>1.2.0.6</version>
     </dependency>
   </dependencies>
 
